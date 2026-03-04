@@ -34,7 +34,6 @@ Notre approche a évolué pour pallier les limites des modèles statistiques cla
 Assurez-vous d'avoir Python 3.9+ installé.
 
 ### 2. Installation des dépendances
-bash
 pip install -r requirements.txt
 
 ### 3. Lancement API
@@ -43,4 +42,4 @@ python api.py
 
 ### 4. Lancement AppWeb
 cd deployment/AppWeb
-Python appweb.py
+python appweb.py
