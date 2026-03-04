@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal de Prédiction ML4</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f3; margin: 0; padding: 20px; }
+    .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+    
+    .section-title { background: #3498db; color: white; padding: 8px 15px; border-radius: 4px; margin-top: 20px; font-weight: bold; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; padding: 15px 0; }
+    
+    .field { display: flex; flex-direction: column; }
+    label { font-size: 0.75rem; font-weight: 600; color: #34495e; margin-bottom: 4px; }
+    input, select { padding: 8px; border: 1px solid #dcdde1; border-radius: 4px; outline: none; transition: border 0.3s; background: white; }
+    input:focus, select:focus { border-color: #3498db; }
+
+    .actions { margin-top: 30px; display: flex; gap: 10px; position: sticky; bottom: 20px; background: white; padding: 15px; border-top: 1px solid #eee; z-index: 10; }
+    button { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    .btn-submit { background: #27ae60; color: white; flex-grow: 1; font-size: 1.1rem; }
+    .btn-example { background: #34495e; color: white; }
+    button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    #result { margin-top: 20px; padding: 20px; border-radius: 8px; display: none; text-align: center; font-size: 1.2rem; }
+    .success { background: #dff9fb; border: 2px solid #27ae60; color: #2c3e50; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>IA Prédiction Bourse (ML 4)</h1>
+  <p>Analyse de la performance 2025 basée sur le rendement sectoriel historique.</p>
+
+  <form id="predictForm">
+    <div class="section-title">Informations Générales</div>
+    <div class="grid">
+      <div class="field">
+        <label>Secteur d'activité</label>
+        <select id="Sector" required>
+          <option value="">-- Choisir un secteur --</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="Technology">Technology</option>
+          <option value="Basic Materials">Basic Materials</option>
+          <option value="Consumer Cyclical">Consumer Cyclical</option>
+          <option value="Industrials">Industrials</option>
+          <option value="Consumer Defensive">Consumer Defensive</option>
+          <option value="Communication Services">Communication Services</option>
+          <option value="Real Estate">Real Estate</option>
+          <option value="Energy">Energy</option>
+          <option value="Financial Services">Financial Services</option>
+          <option value="Utilities">Utilities</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title">Données Financières 2021</div>
+    <div class="grid" id="grid-2021"></div>
+
+    <div class="section-title">Données Financières 2022</div>
+    <div class="grid" id="grid-2022"></div>
+
+    <div class="section-title">Données Financières 2023</div>
+    <div class="grid" id="grid-2023"></div>
+
+    <div class="section-title">Données Financières 2024</div>
+    <div class="grid" id="grid-2024"></div>
+
+    <div class="actions">
+      <button type="button" class="btn-example" onclick="loadEukedos()">Charger Exemple (Eukedos)</button>
+      <button type="submit" class="btn-submit">Calculer la Prédiction 2025</button>
+    </div>
+  </form>
+
+  <div id="result"></div>
+</div>
+
+<script>
+  const metrics = ["Net_Income", "FCF", "Op_Margin", "ROE", "Debt_Equity", "PER", "ROIC", "Net_Margin", "EPS", "Perf", "Price_per_share"];
+  const years = [2021, 2022, 2023, 2024];
+
+  // Construction dynamique des champs
+  years.forEach(year => {
+    const grid = document.getElementById(`grid-${year}`);
+    metrics.forEach(metric => {
+      const id = `${metric}_${year}`;
+      grid.innerHTML += `
+        <div class="field">
+          <label>${metric.replace(/_/g, ' ')} (${year})</label>
+          <input type="number" step="any" id="${id}" value="0" required>
+        </div>`;
+    });
+  });
+
+  async function loadEukedos() {
+    const data = {
+      "Sector": "Healthcare",
+      "Net_Income_2021": 570000, "FCF_2021": 5308000, "Op_Margin_2021": 0.1, "ROE_2021": 0.02, "Debt_Equity_2021": 3.78, "PER_2021": 58.45, "ROIC_2021": 0.0719, "Net_Margin_2021": 0.0126, "EPS_2021": 0.0251, "Perf_2021": 0.6026, "Price_per_share_2021": 1.8062,
+      "Net_Income_2022": 443000, "FCF_2022": 1028000, "Op_Margin_2022": 0.08, "ROE_2022": 0.02, "Debt_Equity_2022": 3.79, "PER_2022": 71.76, "ROIC_2022": 0.0701, "Net_Margin_2022": 0.0094, "EPS_2022": 0.0195, "Perf_2022": -0.2697, "Price_per_share_2022": 1.2725,
+      "Net_Income_2023": 556000, "FCF_2023": 3588000, "Op_Margin_2023": 0.11, "ROE_2023": 0.02, "Debt_Equity_2023": 3.54, "PER_2023": 45.12, "ROIC_2023": 0.0807, "Net_Margin_2023": 0.0112, "EPS_2023": 0.0244, "Perf_2023": -0.2265, "Price_per_share_2023": 0.935,
+      "Net_Income_2024": -524000, "FCF_2024": -13138000, "Op_Margin_2024": 0.1, "ROE_2024": -0.02, "Debt_Equity_2024": 3.32, "PER_2024": -36.04, "ROIC_2024": 0.0587, "Net_Margin_2024": -0.0101, "EPS_2024": -0.0231, "Perf_2024": -0.1455, "Price_per_share_2024": 0.8025
+    };
+    Object.keys(data).forEach(key => {
+      const el = document.getElementById(key);
+      if(el) el.value = data[key];
+    });
+  }
+
+  document.getElementById("predictForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const resultDiv = document.getElementById("result");
+    
+    const finalPayload = {};
+    // Récupérer le secteur
+    finalPayload["Sector"] = document.getElementById("Sector").value;
+    
+    // Récupérer tous les inputs numériques
+    const inputs = document.querySelectorAll("#predictForm input");
+    inputs.forEach(input => {
+      finalPayload[input.id] = parseFloat(input.value);
+    });
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(finalPayload)
+      });
+      const data = await response.json();
+      
+      if(data.status === "success") {
+        resultDiv.style.display = "block";
+        resultDiv.className = "success";
+        const color = data.variation_percent >= 0 ? "#27ae60" : "#e74c3c";
+        resultDiv.innerHTML = `
+          <strong>🎯 Résultat de l'IA</strong><br>
+          Variation prédite : <span style="color:${color}; font-weight:bold;">${data.variation_percent}%</span><br>
+          Objectif de prix 2025 : <strong>${data.predicted_price_2025} €</strong>
+        `;
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        alert("Erreur API : " + data.message);
+      }
+    } catch (err) {
+      alert("Erreur : Impossible de joindre l'API (api.py est-il lancé ?)");
+    }
+  });
+</script>
+</body>
+</html>
