@@ -34,7 +34,7 @@ Notre approche a évolué pour pallier les limites des modèles statistiques cla
 Assurez-vous d'avoir Python 3.9+ installé.
 
 ### 2. Installation des dépendances
-```bash
+bash
 pip install -r requirements.txt
 
 ### 3. Lancement API
